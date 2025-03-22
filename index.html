@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>特殊效果</title>
+    <style>
+        /* 科技感背景 */
+        body {
+            margin: 0;
+            background: linear-gradient(45deg, #000428, #004e92);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 动态网格效果 */
+        .grid {
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: linear-gradient(#ffffff0a 1px, transparent 1px),
+                linear-gradient(90deg, #ffffff0a 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: move 100s linear infinite;
+        }
+
+        @keyframes move {
+            0% { transform: translate(-50%, -50%); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* 文字动画 */
+        .warning-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: red;
+            font-size: 3em;
+            text-shadow: 0 0 10px #ff0000;
+            animation: zoom 1s infinite alternate;
+        }
+
+        @keyframes zoom {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        /* 格式化页面样式 */
+        .format-screen {
+            display: none;
+            background: #000;
+            color: red;
+            font-family: monospace;
+            text-align: center;
+            padding-top: 30%;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid"></div>
+    <div class="warning-text" id="text">你没办法返回</div>
+    <div class="format-screen" id="formatScreen">
+        <h1>⚠️ 警告！</h1>
+        <div id="formatProgress">正在格式化... 87%</div>
+    </div>
+
+    <script>
+        let step = 0;
+
+        // 监听浏览器返回事件
+        window.addEventListener('popstate', function(event) {
+            event.preventDefault();
+            handleBackAction();
+        });
+
+        // 首次访问创建历史记录
+        history.pushState({step: 0}, "");
+
+        function handleBackAction() {
+            step++;
+
+            switch(step) {
+                case 1:
+                    document.getElementById("text").innerHTML = "说了不能返回";
+                    history.pushState({step: 1}, "");
+                    break;
+                case 2:
+                    showFormatScreen();
+                    history.pushState({step: 2}, "");
+                    simulateFormat();
+                    break;
+                default:
+                    history.back();
+            }
+        }
+
+        function showFormatScreen() {
+            document.body.style.background = "#000";
+            document.querySelector(".grid").style.display = "none";
+            document.getElementById("text").style.display = "none";
+            document.getElementById("formatScreen").style.display = "block";
+        }
+
+        function simulateFormat() {
+            let progress = 0;
+            const timer = setInterval(() => {
+                progress += Math.random()*10;
+                document.getElementById("formatProgress").innerHTML =
+                    `正在格式化... ${Math.min(100, Math.floor(progress))}%`;
+
+                if(progress >= 100) {
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        window.location.href = "https://example.com"; // 替换为正常返回地址
+                    }, 1000);
+                }
+            }, 200);
+        }
+    </script>
+</body>
+</html>
